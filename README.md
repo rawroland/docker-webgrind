@@ -1,27 +1,22 @@
 # Webgrind
 
-```yaml
-version: '3'
-services:
+[Webgrind](https://github.com/jokkedk/webgrind) docker image.
 
-  php:
-    image: php
-    volumes:
-      - "webgrind:/tmp/webgrind:rw"
-    environment:
-      XDEBUG_CONFIG: "profiler_output_dir=/tmp/webgrind"
+To get this to show your xdebug profiler dumps:
 
-  webgrind:
-    container_name: webgrind
-    image: tbfisher/webgrind
-    environment:
-      XDEBUG_OUTPUT_DIR: /tmp
-      WEBGRIND_STORAGE_DIR: /tmp
-      PHP_MAX_EXECUTION_TIME: 1200
-    volumes:
-      - "webgrind:/tmp:rw"
+1. Install xdebug, [enable profiling](https://xdebug.org/docs/profiler) in your php container.
+2. Share your php container `profiler_output_dir` via a docker volume with `/tmp` in the webgrind container.
 
-volumes:
-  webgrind:
-    driver: local
+See [`docker-compose.yml`](docker-compose.yml):
+
+```bash
+docker-compose up -d
+# this enables xdebug in my php container
+docker-compose exec php /bin/bash -c 'sed -i "s/^;//" /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; kill -USR2 1'
+
+# open http://localhost/ to trigger profile
+# open http://localhost:8080/ to view the profile
+
+# clean up
+docker-compose down -v
 ```
