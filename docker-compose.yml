@@ -1,0 +1,35 @@
+version: '3'
+services:
+
+  webgrind:
+    build: .
+    environment:
+      XDEBUG_OUTPUT_DIR: /tmp
+      WEBGRIND_STORAGE_DIR: /tmp
+      PHP_MAX_EXECUTION_TIME: 1200
+    ports:
+      - '8080:8080'
+    volumes:
+      - "webgrind:/tmp:rw"
+
+  php:
+    image: tbfisher/drupal-php:7.2-dev
+    environment:
+      XDEBUG_CONFIG: "profiler_enable=1 profiler_output_dir=/tmp/webgrind"
+    volumes:
+      - "./conf/php/html:/var/www/web"
+      - "webgrind:/tmp/webgrind:rw"
+
+  web:
+    image: tbfisher/drupal-web:nginx-1.14-dev
+    environment:
+      WEB_DOCROOT: /var/www/web
+      WEB_PHPFPM: "php:9000"
+    depends_on:
+      - php
+    ports:
+      - '80:80'
+
+volumes:
+  webgrind:
+    driver: local
