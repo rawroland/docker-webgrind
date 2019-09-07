@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3
 
 ENV TIMEZONE             America/Los_Angeles
 ENV PHP_MEMORY_LIMIT     64M
@@ -16,8 +16,8 @@ RUN apk add --no-cache \
 
 # PHP 5.X and webgrind dependency libraries
 RUN apk add --no-cache \
-    php5 \
-    php5-json
+    php7 \
+    php7-json
 
 # Python and Graphviz for function call graphs
 RUN apk add --no-cache \
@@ -31,15 +31,16 @@ RUN apk add --no-cache \
     musl-dev
 
 # Install webgrind
-RUN git clone --depth=1 --branch=master https://github.com/jokkedk/webgrind $WEB_ROOT && \
+ENV WEBGRIND_VERSION v1.6.0
+RUN git clone --depth=1 --branch=$WEBGRIND_VERSION https://github.com/jokkedk/webgrind $WEB_ROOT && \
     rm -rf $WEB_ROOT/.git
 
 # Remove git after installation
 RUN apk del git
 
 # configure php
-RUN sed -i "s|;*date.timezone =.*|date.timezone = ${TIMEZONE}|i" /etc/php5/php.ini && \
-    sed -i "s|;*memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|i" /etc/php5/php.ini
+RUN sed -i "s|;*date.timezone =.*|date.timezone = ${TIMEZONE}|i" /etc/php7/php.ini && \
+    sed -i "s|;*memory_limit =.*|memory_limit = ${PHP_MEMORY_LIMIT}|i" /etc/php7/php.ini
 # configure webgrind
 RUN sed -i "s|.*storageDir =.*|static \$storageDir = '${WEBGRIND_STORAGE_DIR}';|i" ${WEB_ROOT}/config.php && \
     sed -i "s|.*profilerDir =.*|static \$profilerDir = '${XDEBUG_OUTPUT_DIR}';|i" ${WEB_ROOT}/config.php
