@@ -31,7 +31,7 @@ RUN apk add --no-cache \
     musl-dev
 
 # Install webgrind
-ENV WEBGRIND_VERSION v1.6.0
+ENV WEBGRIND_VERSION v1.7.0
 RUN git clone --depth=1 --branch=$WEBGRIND_VERSION https://github.com/jokkedk/webgrind $WEB_ROOT && \
     rm -rf $WEB_ROOT/.git
 
